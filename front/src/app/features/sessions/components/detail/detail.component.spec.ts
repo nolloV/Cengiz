@@ -1,9 +1,9 @@
 import { HttpClientModule } from '@angular/common/http';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick, flush } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { RouterTestingModule } from '@angular/router/testing';
-import { expect } from '@jest/globals';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { of } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SessionService } from '../../../../services/session.service';
@@ -14,6 +14,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { By } from '@angular/platform-browser';
+import { expect } from '@jest/globals';
 
 describe('DetailComponent', () => {
   let component: DetailComponent;
@@ -71,7 +72,8 @@ describe('DetailComponent', () => {
         ReactiveFormsModule,
         MatIconModule,
         MatButtonModule,
-        MatCardModule
+        MatCardModule,
+        NoopAnimationsModule
       ],
       declarations: [DetailComponent],
       providers: [
@@ -157,4 +159,17 @@ describe('DetailComponent', () => {
     component.back();
     expect(spy).toHaveBeenCalled();
   });
+
+  // Test de la suppression de la session
+  it('should delete session and navigate to sessions list', fakeAsync(() => {
+    // Espionner la méthode navigate du router
+    const navigateSpy = jest.spyOn(router, 'navigate');
+    component.delete();// Appeler la méthode delete du composant  
+    tick();// Avancer le temps pour compléter l'observable     
+    flush();// Vider toutes les minuteries en attente    
+    // Vérifier que la méthode delete de sessionApiService a été appelée avec le bon ID de session
+    expect(sessionApiService.delete).toHaveBeenCalledWith('1');
+    // Vérifier que la méthode navigate du router a été appelée avec le bon chemin
+    expect(navigateSpy).toHaveBeenCalledWith(['sessions']);
+  }));
 });
