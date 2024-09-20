@@ -22,7 +22,10 @@ describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [
-        RouterTestingModule, // Module de test pour le routage
+        RouterTestingModule.withRoutes([ // Définition des routes pour les tests d'intégration
+          { path: '', component: AppComponent },
+          { path: 'login', component: AppComponent }
+        ]),
         HttpClientModule, // Module HTTP pour les requêtes
         MatToolbarModule // Module Angular Material pour la barre d'outils
       ],
@@ -30,18 +33,8 @@ describe('AppComponent', () => {
         AppComponent // Déclaration du composant à tester
       ],
       providers: [
-        {
-          provide: AuthService,
-          useValue: {} // Mock AuthService si nécessaire
-        },
-        {
-          provide: SessionService,
-          useValue: {
-            isLogged: false, // État de connexion initial
-            $isLogged: () => new BehaviorSubject<boolean>(false).asObservable(), // Observable pour l'état de connexion
-            logOut: jest.fn() // Mock de la méthode logOut
-          }
-        }
+        AuthService, // Utilisation du service réel AuthService
+        SessionService // Utilisation du service réel SessionService
       ]
     }).compileComponents();
 
@@ -51,6 +44,9 @@ describe('AppComponent', () => {
     sessionService = TestBed.inject(SessionService);
     router = TestBed.inject(Router);
     ngZone = TestBed.inject(NgZone); // Initialisation de NgZone
+
+    // Espionner la méthode logOut de sessionService
+    jest.spyOn(sessionService, 'logOut');
   });
 
   // Test pour vérifier que le composant est créé
@@ -58,16 +54,20 @@ describe('AppComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  // Test pour vérifier que l'état de connexion est retourné en tant qu'observable
+  // Test d'intégration pour vérifier que l'état de connexion est retourné en tant qu'observable
   it('should return the logged status as an observable', (done) => {
+    // Simuler l'état de connexion
+    sessionService.isLogged = true;
+    sessionService.$isLogged = () => new BehaviorSubject<boolean>(true).asObservable();
+
     const isLogged$: Observable<boolean> = component.$isLogged();
     isLogged$.subscribe((isLogged) => {
-      expect(isLogged).toBe(false);
+      expect(isLogged).toBe(true);
       done();
     });
   });
 
-  // Test pour vérifier que la déconnexion et la navigation fonctionnent correctement
+  // Test d'intégration pour vérifier que la déconnexion et la navigation fonctionnent correctement
   it('should log out and navigate to the root path', () => {
     const navigateSpy = jest.spyOn(router, 'navigate');
     ngZone.run(() => { // Utilisation de NgZone pour encapsuler la navigation
@@ -75,5 +75,13 @@ describe('AppComponent', () => {
     });
     expect(sessionService.logOut).toHaveBeenCalled();
     expect(navigateSpy).toHaveBeenCalledWith(['']);
+  });
+
+  // Test d'intégration pour vérifier la navigation vers la page de connexion
+  it('should navigate to the login page', async () => {
+    await ngZone.run(async () => {
+      await router.navigate(['login']);
+      expect(router.url).toBe('/login');
+    });
   });
 });

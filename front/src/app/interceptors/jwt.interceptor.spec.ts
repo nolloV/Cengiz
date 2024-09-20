@@ -37,8 +37,8 @@ describe('JwtInterceptor', () => {
         httpMock.verify();
     });
 
-    // Test pour vérifier que l'en-tête Authorization est ajouté si l'utilisateur est authentifié
-    it('should add an Authorization header if the user is logged in', () => {
+    // Test d'intégration pour vérifier que l'en-tête Authorization est ajouté si l'utilisateur est authentifié
+    it('should add an Authorization header if the user is logged in (integration)', () => {
         sessionService.isLogged = true;
         sessionService.sessionInformation = { token: 'fake-jwt-token' } as any;
 
@@ -50,8 +50,8 @@ describe('JwtInterceptor', () => {
         expect(httpRequest.request.headers.get('Authorization')).toBe('Bearer fake-jwt-token');
     });
 
-    // Test pour vérifier que l'en-tête Authorization n'est pas ajouté si l'utilisateur n'est pas authentifié
-    it('should not add an Authorization header if the user is not logged in', () => {
+    // Test d'intégration pour vérifier que l'en-tête Authorization n'est pas ajouté si l'utilisateur n'est pas authentifié
+    it('should not add an Authorization header if the user is not logged in (integration)', () => {
         sessionService.isLogged = false;
 
         httpClient.get('/test').subscribe();

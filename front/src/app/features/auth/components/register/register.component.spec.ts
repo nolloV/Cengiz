@@ -94,7 +94,7 @@ describe('RegisterComponent', () => {
     expect(component.form.valid).toBeTruthy();
   });
 
-  // Test pour vérifier que le service d'authentification est appelé lors de la soumission
+  // Test d'intégration pour vérifier que le service d'authentification est appelé lors de la soumission
   it('should call authService.register on submit', () => {
     const registerRequest = {
       email: 'test@example.com',

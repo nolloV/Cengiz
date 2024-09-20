@@ -89,7 +89,7 @@ describe('LoginComponent', () => {
     expect(component.form.valid).toBeTruthy(); // Vérifie que le formulaire est valide si les champs sont corrects
   });
 
-  // Test pour vérifier que la méthode submit appelle authService.login
+  // Test d'intégration pour vérifier que la méthode submit appelle authService.login
   it('should call authService.login on submit', () => {
     const loginRequest = { email: 'test@example.com', password: '123' };
     component.form.setValue(loginRequest);

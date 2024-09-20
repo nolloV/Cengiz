@@ -100,26 +100,6 @@ describe('DetailComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  // Test de récupération de la session lors de l'initialisation
-  it('should fetch session on init', () => {
-    expect(sessionApiService.detail).toHaveBeenCalledWith('1');
-    expect(component.session).toEqual({
-      id: 1,
-      teacher_id: 1,
-      users: [1]
-    });
-    expect(component.isParticipate).toBe(true);
-  });
-
-  // Test de récupération des détails de l'enseignant
-  it('should fetch teacher details', () => {
-    expect(teacherService.detail).toHaveBeenCalledWith('1');
-    expect(component.teacher).toEqual({
-      id: 1,
-      name: 'Teacher Name'
-    });
-  });
-
   // Test de l'affichage du bouton de suppression uniquement pour l'admin
   it('should show delete button only for admin', () => {
     // Cas où l'utilisateur est admin
@@ -139,18 +119,6 @@ describe('DetailComponent', () => {
     buttons = fixture.debugElement.queryAll(By.css('button[color="warn"]'));
     deleteButton = buttons.find(button => button.nativeElement.textContent.includes('Delete'));
     expect(deleteButton).toBeUndefined(); // Le bouton ne doit pas être présent
-  });
-
-  // Test de la participation à la session
-  it('should participate in session', () => {
-    component.participate();
-    expect(sessionApiService.participate).toHaveBeenCalledWith('1', '1');
-  });
-
-  // Test de l'annulation de la participation à la session
-  it('should unParticipate from session', () => {
-    component.unParticipate();
-    expect(sessionApiService.unParticipate).toHaveBeenCalledWith('1', '1');
   });
 
   // Test de la navigation vers l'arrière

@@ -8,7 +8,10 @@ describe('SessionService', () => {
 
   // Configuration du module de test et création d'une instance de SessionService
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({
+      providers: [SessionService]
+    });
+
     service = TestBed.inject(SessionService);
   });
 
@@ -35,24 +38,6 @@ describe('SessionService', () => {
     });
   });
 
-  // Test pour vérifier que logIn met à jour isLogged et sessionInformation
-  it('should log in a user and update isLogged and sessionInformation', () => {
-    const user: SessionInformation = {
-      token: 'fake-token',
-      type: 'Bearer',
-      id: 1,
-      username: 'johndoe',
-      firstName: 'John',
-      lastName: 'Doe',
-      admin: true
-    };
-
-    service.logIn(user);
-
-    expect(service.isLogged).toBe(true);
-    expect(service.sessionInformation).toEqual(user);
-  });
-
   // Test pour vérifier que $isLogged émet true lors de la connexion d'un utilisateur
   it('should emit true when user logs in', (done) => {
     const user: SessionInformation = {
@@ -73,25 +58,6 @@ describe('SessionService', () => {
     });
 
     service.logIn(user);
-  });
-
-  // Test pour vérifier que logOut met à jour isLogged et sessionInformation
-  it('should log out a user and update isLogged and sessionInformation', () => {
-    const user: SessionInformation = {
-      token: 'fake-token',
-      type: 'Bearer',
-      id: 1,
-      username: 'johndoe',
-      firstName: 'John',
-      lastName: 'Doe',
-      admin: true
-    };
-
-    service.logIn(user);
-    service.logOut();
-
-    expect(service.isLogged).toBe(false);
-    expect(service.sessionInformation).toBeUndefined();
   });
 
   // Test pour vérifier que $isLogged émet false lors de la déconnexion d'un utilisateur
@@ -116,5 +82,27 @@ describe('SessionService', () => {
     });
 
     service.logOut();
+  });
+
+  // Test d'intégration pour vérifier que le service fonctionne correctement avec un composant
+  it('should integrate with a component to log in and log out a user', () => {
+    const user: SessionInformation = {
+      token: 'fake-token',
+      type: 'Bearer',
+      id: 1,
+      username: 'johndoe',
+      firstName: 'John',
+      lastName: 'Doe',
+      admin: true
+    };
+
+    // Simuler l'utilisation du service dans un composant
+    service.logIn(user);
+    expect(service.isLogged).toBe(true);
+    expect(service.sessionInformation).toEqual(user);
+
+    service.logOut();
+    expect(service.isLogged).toBe(false);
+    expect(service.sessionInformation).toBeUndefined();
   });
 });

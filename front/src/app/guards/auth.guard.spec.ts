@@ -45,7 +45,7 @@ describe('AuthGuard', () => {
         router = TestBed.inject(Router) as unknown as Partial<jest.Mocked<Router>>;
     });
 
-    // Test pour vérifier que l'utilisateur authentifié peut accéder à la route
+    // Test d'intégration pour vérifier que l'utilisateur authentifié peut accéder à la route
     it('should allow the authenticated user to access the route', () => {
         sessionService.isLogged = true;
 
@@ -55,7 +55,7 @@ describe('AuthGuard', () => {
         expect(router.navigate).not.toHaveBeenCalled();
     });
 
-    // Test pour vérifier que l'utilisateur non authentifié est redirigé vers la page de connexion
+    // Test d'intégration pour vérifier que l'utilisateur non authentifié est redirigé vers la page de connexion
     it('should redirect an unauthenticated user to the login route', () => {
         sessionService.isLogged = false;
 

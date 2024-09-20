@@ -35,14 +35,14 @@ describe('AuthRoutingModule', () => {
         router.initialNavigation(); // Initialisation de la navigation du routeur
     });
 
+    // Test d'intégration pour vérifier que la navigation vers "login" redirige vers /login
     it('should navigate to "login" redirects you to /login', async () => {
-        // Test pour vérifier que la navigation vers "login" redirige vers /login
         await router.navigate(['login']);
         expect(location.path()).toBe('/login');
     });
 
+    // Test d'intégration pour vérifier que la navigation vers "register" redirige vers /register
     it('should navigate to "register" redirects you to /register', async () => {
-        // Test pour vérifier que la navigation vers "register" redirige vers /register
         await router.navigate(['register']);
         expect(location.path()).toBe('/register');
     });

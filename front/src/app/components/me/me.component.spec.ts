@@ -90,21 +90,21 @@ describe('MeComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  // Test pour vérifier que l'utilisateur est initialisé lors de ngOnInit
+  // Test d'intégration pour vérifier que l'utilisateur est initialisé lors de ngOnInit
   it('should initialize user on ngOnInit', () => {
     component.ngOnInit();
     expect(userService.getById).toHaveBeenCalledWith('1');
     expect(component.user).toEqual(mockUser);
   });
 
-  // Test pour vérifier que la méthode back appelle window.history.back
+  // Test d'intégration pour vérifier que la méthode back appelle window.history.back
   it('should call window.history.back on back', () => {
     const spy = jest.spyOn(window.history, 'back');
     component.back();
     expect(spy).toHaveBeenCalled();
   });
 
-  // Test pour vérifier que la méthode delete fonctionne correctement
+  // Test d'intégration pour vérifier que la méthode delete fonctionne correctement
   it('should delete user, show snackbar, log out and navigate on delete', () => {
     // Espionner les méthodes pour vérifier qu'elles sont appelées correctement
     const deleteSpy = jest.spyOn(userService, 'delete');

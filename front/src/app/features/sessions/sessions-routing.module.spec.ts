@@ -9,38 +9,34 @@ describe('SessionsRoutingModule', () => {
     let router: Router;
     let location: Location;
 
-    // Configuration du module de test
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [RouterTestingModule.withRoutes([]), SessionsRoutingModule] // Importation des modules de test et de routage
+            imports: [RouterTestingModule.withRoutes([]), SessionsRoutingModule]
         });
 
-        router = TestBed.inject(Router); // Injection du routeur
-        location = TestBed.inject(Location); // Injection de l'emplacement
-        router.initialNavigation(); // Initialisation de la navigation
+        router = TestBed.inject(Router);
+        location = TestBed.inject(Location);
+        router.initialNavigation();
     });
 
-    // Test pour vérifier la navigation vers la route racine
+    const testNavigation = async (path: string, expectedPath: string) => {
+        await router.navigate([path]);
+        expect(location.path()).toBe(expectedPath);
+    };
+
     it('should navigate to "" redirects to ListComponent', async () => {
-        await router.navigate(['']); // Navigation vers la route racine
-        expect(location.path()).toBe('/'); // Vérification du chemin
+        await testNavigation('', '/');
     });
 
-    // Test pour vérifier la navigation vers la route de détail
     it('should navigate to "detail/:id" redirects to DetailComponent', async () => {
-        await router.navigate(['detail/1']); // Navigation vers la route de détail avec un ID
-        expect(location.path()).toBe('/detail/1'); // Vérification du chemin
+        await testNavigation('detail/1', '/detail/1');
     });
 
-    // Test pour vérifier la navigation vers la route de création
     it('should navigate to "create" redirects to FormComponent', async () => {
-        await router.navigate(['create']); // Navigation vers la route de création
-        expect(location.path()).toBe('/create'); // Vérification du chemin
+        await testNavigation('create', '/create');
     });
 
-    // Test pour vérifier la navigation vers la route de mise à jour
     it('should navigate to "update/:id" redirects to FormComponent', async () => {
-        await router.navigate(['update/1']); // Navigation vers la route de mise à jour avec un ID
-        expect(location.path()).toBe('/update/1'); // Vérification du chemin
+        await testNavigation('update/1', '/update/1');
     });
 });

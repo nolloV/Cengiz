@@ -64,25 +64,25 @@ describe('AppRoutingModule', () => {
         router.initialNavigation();
     });
 
-    // Test pour vérifier la navigation vers le module sessions
+    // Test d'intégration pour vérifier la navigation vers le module sessions
     it('should navigate to "sessions" redirects to sessions module', async () => {
         await router.navigate(['sessions']);
         expect(location.path()).toBe('/sessions');
     });
 
-    // Test pour vérifier la navigation vers le composant MeComponent
+    // Test d'intégration pour vérifier la navigation vers le composant MeComponent
     it('should navigate to "me" redirects to MeComponent', async () => {
         await router.navigate(['me']);
         expect(location.path()).toBe('/me');
     });
 
-    // Test pour vérifier la navigation vers le composant NotFoundComponent
+    // Test d'intégration pour vérifier la navigation vers le composant NotFoundComponent
     it('should navigate to "404" redirects to NotFoundComponent', async () => {
         await router.navigate(['404']);
         expect(location.path()).toBe('/404');
     });
 
-    // Test pour vérifier la redirection des chemins inconnus vers le composant NotFoundComponent
+    // Test d'intégration pour vérifier la redirection des chemins inconnus vers le composant NotFoundComponent
     it('should redirect unknown paths to "404"', async () => {
         await router.navigate(['unknown']);
         expect(location.path()).toBe('/404');
