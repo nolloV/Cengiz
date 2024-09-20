@@ -56,37 +56,6 @@ describe('AuthService', () => {
     req.flush({});
   });
 
-  it('should login a user', () => {
-    // Données de test pour la connexion
-    const loginRequest: LoginRequest = {
-      email: 'test@example.com',
-      password: 'password123'
-    };
-
-    // Données de réponse simulées pour la connexion
-    const mockSessionInformation: SessionInformation = {
-      token: 'fake-jwt-token',
-      type: 'Bearer',
-      id: 1,
-      username: 'testuser',
-      firstName: 'John',
-      lastName: 'Doe',
-      admin: false
-    };
-
-    // Appel de la méthode login du service
-    authService.login(loginRequest).subscribe(response => {
-      // Vérification que la réponse correspond aux données simulées
-      expect(response).toEqual(mockSessionInformation);
-    });
-
-    // Vérification de la requête HTTP envoyée
-    const req = httpMock.expectOne(`${authService['pathService']}/login`);
-    expect(req.request.method).toBe('POST');
-    req.flush(mockSessionInformation);
-  });
-
-  // Test d'intégration pour vérifier l'interaction entre AuthService et SessionService
   it('should log in a user and update session information', () => {
     // Données de test pour la connexion
     const loginRequest: LoginRequest = {
