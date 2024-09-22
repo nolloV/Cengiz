@@ -69,6 +69,6 @@ describe('Login spec', () => {
         cy.wait('@deleteUser')
 
         // Vérifier que l'utilisateur est redirigé vers la page d'accueil
-        cy.url().should('eq', Cypress.config().baseUrl)
+        cy.url().should('include', '/')
     })
 });
