@@ -81,6 +81,13 @@
             <artifactId>mapstruct-processor</artifactId>
             <version>1.5.1.Final</version>
         </dependency>
+
+        <!-- Ajout de la dépendance H2 pour les tests -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -114,6 +121,11 @@
                         <goals>
                             <goal>report</goal>
                         </goals>
+                        <configuration>
+                            <excludes>
+                                <exclude>com/openclassrooms/starterjwt/dto/**</exclude>
+                            </excludes>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>jacoco-check</id>
