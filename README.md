@@ -41,7 +41,7 @@ After installing, make sure that the `JAVA_HOME` environment variable is set cor
 
 ```bash
 java -version
-
+```
 
 2. **MySQL Database:**
 
