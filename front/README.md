@@ -55,7 +55,7 @@ Launching e2e test:
 
 Generate coverage report (you should launch e2e test before):
 
-> npm run e2e:coverage
+> npx nyc --reporter=html --reporter=text cypress run
 
 Report is available here:
 
