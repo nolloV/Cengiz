@@ -1,6 +1,7 @@
 /// <reference types="cypress" />
-describe('Login and Session List spec', () => {
+describe('Login and Session Management Spec', () => {
     it('Login successful, display session list, click Edit button, and update session', () => {
+        // Visiter la page de connexion
         cy.visit('/login')
 
         // Intercepter la requête de login pour inclure le token avec les informations utilisateur
@@ -11,11 +12,11 @@ describe('Login and Session List spec', () => {
                 firstName: 'firstName',
                 lastName: 'lastName',
                 admin: true,
-                token: 'fake-jwt-token'
+                token: 'fake-jwt-token' // Token factice pour simuler l'authentification
             },
         }).as('loginRequest')
 
-        // Intercepter la requête pour obtenir les sessions
+        // Intercepter la requête pour obtenir la liste des sessions
         cy.intercept('GET', '/api/session', {
             body: [
                 {
@@ -41,7 +42,7 @@ describe('Login and Session List spec', () => {
             ]
         }).as('getSessions')
 
-        // Intercepter la requête pour obtenir les détails de la session
+        // Intercepter la requête pour obtenir les détails de la deuxième session
         cy.intercept('GET', '/api/session/2', {
             body: {
                 id: 2,
@@ -55,7 +56,7 @@ describe('Login and Session List spec', () => {
             }
         }).as('getSessionDetail')
 
-        // Intercepter la requête pour obtenir les enseignants
+        // Intercepter la requête pour obtenir la liste des enseignants
         cy.intercept('GET', '/api/teacher', {
             body: [
                 { id: 1, firstName: 'Jane', lastName: 'Doe' },
@@ -78,17 +79,17 @@ describe('Login and Session List spec', () => {
             }
         }).as('updateSession')
 
-        // Effectuer le login
+        // Effectuer le login avec des informations d'identification
         cy.get('input[formControlName=email]').type("yoga@studio.com")
         cy.get('input[formControlName=password]').type("test!1234{enter}{enter}")
 
-        // Vérifier que l'URL inclut '/sessions'
+        // Vérifier que l'URL inclut '/sessions' après la connexion
         cy.url().should('include', '/sessions')
 
         // Attendre que la requête pour obtenir les sessions soit terminée
         cy.wait('@getSessions')
 
-        // Vérifier que les sessions sont affichées
+        // Vérifier que le nombre de sessions affichées est correct
         cy.get('.list .items .item').should('have.length', 2)
 
         // Vérifier les détails de la première session
@@ -108,7 +109,7 @@ describe('Login and Session List spec', () => {
             cy.get('button[mat-raised-button][color="primary"]').contains('Edit').click()
         })
 
-        // Vérifier que l'URL inclut '/update/2'
+        // Vérifier que l'URL inclut '/update/2' pour l'édition de la session
         cy.url().should('include', '/update/2')
 
         // Attendre que la requête pour obtenir les détails de la session soit terminée
@@ -117,13 +118,13 @@ describe('Login and Session List spec', () => {
         // Attendre que la requête pour obtenir les enseignants soit terminée
         cy.wait('@getTeachers')
 
-        // Mettre à jour le formulaire de session
+        // Mettre à jour le formulaire de session avec de nouvelles informations
         cy.get('input[formControlName=name]').clear().type('Updated Evening Yoga')
         cy.get('input[formControlName=date]').clear().type('2024-09-19')
         cy.get('mat-select[formControlName=teacher_id]').click().get('mat-option').contains('Jane Doe').click()
         cy.get('textarea[formControlName=description]').clear().type('An updated energizing evening yoga session.')
 
-        // Intercepter la requête pour obtenir les sessions après la mise à jour
+        // Intercepter la requête pour obtenir la liste des sessions après la mise à jour
         cy.intercept('GET', '/api/session', {
             body: [
                 {
@@ -149,7 +150,7 @@ describe('Login and Session List spec', () => {
             ]
         }).as('getSessionsAfterUpdate')
 
-        // Soumettre le formulaire
+        // Soumettre le formulaire de mise à jour
         cy.get('button[type=submit]').click()
 
         // Attendre que la requête pour mettre à jour la session soit terminée

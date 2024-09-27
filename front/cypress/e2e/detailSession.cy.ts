@@ -1,9 +1,10 @@
 /// <reference types="cypress" />
 describe('Login and Session List and Detail spec', () => {
     it('Login successful, display session list, navigate to session detail, and delete session', () => {
+        // Visiter la page de connexion
         cy.visit('/login')
 
-        // Intercepter la requête de login pour inclure le token avec les informations utilisateur
+        // Intercepter la requête de login pour inclure un token fictif
         cy.intercept('POST', '/api/auth/login', {
             body: {
                 id: 1,
@@ -15,7 +16,7 @@ describe('Login and Session List and Detail spec', () => {
             },
         }).as('loginRequest')
 
-        // Intercepter la requête pour obtenir les sessions
+        // Intercepter la requête pour obtenir la liste des sessions
         cy.intercept('GET', '/api/session', {
             body: [
                 {
@@ -41,7 +42,7 @@ describe('Login and Session List and Detail spec', () => {
             ]
         }).as('getSessions')
 
-        // Intercepter la requête pour obtenir les détails de la session
+        // Intercepter la requête pour obtenir les détails de la première session
         cy.intercept('GET', '/api/session/1', {
             body: {
                 id: 1,
@@ -55,7 +56,7 @@ describe('Login and Session List and Detail spec', () => {
             }
         }).as('getSessionDetail')
 
-        // Intercepter la requête pour obtenir les détails du professeur
+        // Intercepter la requête pour obtenir les détails du professeur associé à la session
         cy.intercept('GET', '/api/teacher/1', {
             body: {
                 id: 1,
@@ -66,52 +67,52 @@ describe('Login and Session List and Detail spec', () => {
             }
         }).as('getTeacherDetail')
 
-        // Intercepter la requête de suppression de la session
+        // Intercepter la requête de suppression de la première session
         cy.intercept('DELETE', '/api/session/1', {
             statusCode: 200,
             body: {}
         }).as('deleteSession')
 
-        // Effectuer le login
+        // Remplir le formulaire de connexion avec les informations d'identification
         cy.get('input[formControlName=email]').type("yoga@studio.com")
         cy.get('input[formControlName=password]').type("test!1234{enter}{enter}")
 
-        // Vérifier que l'URL inclut '/sessions'
+        // Vérifier que l'utilisateur est redirigé vers la page des sessions
         cy.url().should('include', '/sessions')
 
         // Attendre que la requête pour obtenir les sessions soit terminée
         cy.wait('@getSessions')
 
-        // Vérifier que les sessions sont affichées
+        // Vérifier que les sessions affichées correspondent à l'attendu
         cy.get('.list .items .item').should('have.length', 2)
 
-        // Vérifier les détails de la première session
+        // Vérifier les détails de la première session dans la liste
         cy.get('.list .items .item').eq(0).within(() => {
             cy.get('mat-card-title').should('contain', 'Morning Yoga')
             cy.get('mat-card-subtitle').should('contain', 'Session on September 17, 2024')
             cy.get('p').should('contain', 'A relaxing morning yoga session.')
         })
 
-        // Cliquer sur le bouton "Detail" de la première session
+        // Cliquer sur le bouton "Detail" de la première session pour naviguer vers les détails
         cy.get('.list .items .item').eq(0).within(() => {
             cy.get('button').contains('Detail').click()
         })
 
-        // Vérifier que l'URL inclut '/detail/1'
+        // Vérifier que l'URL inclut '/detail/1' après la navigation
         cy.url().should('include', '/detail/1')
 
-        // Attendre que la requête pour obtenir les détails de la session soit terminée
+        // Attendre que les détails de la session soient chargés
         cy.wait('@getSessionDetail')
 
-        // Attendre que la requête pour obtenir les détails du professeur soit terminée
+        // Attendre que les détails du professeur soient chargés
         cy.wait('@getTeacherDetail')
 
-        // Vérifier les détails de la session sur la page de détail
+        // Vérifier que les détails de la session sont correctement affichés sur la page de détail
         cy.get('h1').should('contain', 'Morning Yoga')
         cy.get('mat-card-subtitle').should('contain', 'Jane DOE')
         cy.get('.description').should('contain', 'A relaxing morning yoga session.')
 
-        // Intercepter la requête pour obtenir les sessions après la suppression avant de cliquer sur le bouton "Delete"
+        // Intercepter la requête pour obtenir la liste des sessions après suppression
         cy.intercept('GET', '/api/session', {
             body: [
                 {
@@ -127,19 +128,19 @@ describe('Login and Session List and Detail spec', () => {
             ]
         }).as('getSessionsAfterDelete')
 
-        // Cliquer sur le bouton "Delete"
+        // Cliquer sur le bouton "Delete" pour supprimer la session
         cy.get('button').contains('Delete').click()
 
         // Attendre que la requête de suppression soit terminée
         cy.wait('@deleteSession')
 
-        // Vérifier que l'utilisateur est redirigé vers la page des sessions
+        // Vérifier que l'utilisateur est redirigé vers la page des sessions après suppression
         cy.url().should('include', '/sessions')
 
-        // Attendre que la requête pour obtenir les sessions après la suppression soit terminée
+        // Attendre que la requête pour obtenir la liste des sessions après la suppression soit terminée
         cy.wait('@getSessionsAfterDelete')
 
-        // Vérifier que la session a été supprimée
+        // Vérifier que la session a bien été supprimée de la liste
         cy.get('.list .items .item').should('have.length', 1)
     })
 });

@@ -1,6 +1,7 @@
 /// <reference types="cypress" />
 describe('Login spec', () => {
     it('Login successful and navigate to account', () => {
+        // Visiter la page de connexion
         cy.visit('/login')
 
         // Intercepter la requête de login pour inclure le token avec les informations utilisateur
@@ -21,11 +22,11 @@ describe('Login spec', () => {
         // Intercepter la requête de session (si nécessaire)
         cy.intercept('GET', '/api/session', []).as('session')
 
-        // Effectuer le login
+        // Remplir le formulaire de connexion avec l'email et le mot de passe
         cy.get('input[formControlName=email]').type("yoga@studio.com")
         cy.get('input[formControlName=password]').type("test!1234{enter}{enter}")
 
-        // Vérifier que l'URL inclut '/sessions'
+        // Vérifier que l'utilisateur est redirigé vers la page des sessions
         cy.url().should('include', '/sessions')
 
         // Intercepter la requête pour obtenir les informations utilisateur par ID
@@ -41,16 +42,16 @@ describe('Login spec', () => {
             },
         }).as('getUser')
 
-        // Cliquer sur le bouton "Account"
+        // Cliquer sur le bouton "Account" pour accéder aux informations du compte
         cy.get('span[routerlink="me"]').click()
 
-        // Vérifier que l'URL inclut '/me'
+        // Vérifier que l'URL inclut '/me' après la navigation
         cy.url().should('include', '/me')
 
         // Attendre que la requête pour obtenir les informations utilisateur soit terminée
         cy.wait('@getUser')
 
-        // Vérifier que les informations utilisateur sont affichées
+        // Vérifier que les informations utilisateur sont correctement affichées
         cy.get('p').contains('Name: Admin ADMIN')
         cy.get('p').contains('Email: yoga@studio.com')
         cy.get('p').contains('You are admin')
