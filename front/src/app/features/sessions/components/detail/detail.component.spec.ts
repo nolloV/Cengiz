@@ -4,7 +4,6 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { RouterTestingModule } from '@angular/router/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { of } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SessionService } from '../../../../services/session.service';
 import { TeacherService } from '../../../../services/teacher.service';
@@ -15,8 +14,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { By } from '@angular/platform-browser';
 import { expect } from '@jest/globals';
+import { of } from 'rxjs';
 
-describe('DetailComponent', () => {
+describe('DetailComponent - Integration Test', () => {
   let component: DetailComponent;
   let fixture: ComponentFixture<DetailComponent>;
   let sessionService: SessionService;
@@ -24,50 +24,13 @@ describe('DetailComponent', () => {
   let teacherService: TeacherService;
   let router: Router;
 
-  // Mock du service SessionService
-  const mockSessionService = {
-    sessionInformation: {
-      admin: true, // Assurez-vous que l'utilisateur est configuré en tant qu'administrateur
-      id: 1
-    }
-  };
-
-  // Mock du service SessionApiService
-  const mockSessionApiService = {
-    detail: jest.fn().mockReturnValue(of({
-      id: 1,
-      teacher_id: 1,
-      users: [1]
-    })), // Mock de la méthode detail
-    delete: jest.fn().mockReturnValue(of({})), // Mock de la méthode delete
-    participate: jest.fn().mockReturnValue(of({})), // Mock de la méthode participate
-    unParticipate: jest.fn().mockReturnValue(of({})) // Mock de la méthode unParticipate
-  };
-
-  // Mock du service TeacherService
-  const mockTeacherService = {
-    detail: jest.fn().mockReturnValue(of({
-      id: 1,
-      name: 'Teacher Name'
-    })) // Mock de la méthode detail
-  };
-
-  // Mock du service ActivatedRoute
-  const mockActivatedRoute = {
-    snapshot: {
-      paramMap: {
-        get: jest.fn().mockReturnValue('1') // Mock de la méthode get
-      }
-    }
-  };
-
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [
         RouterTestingModule.withRoutes([
           { path: 'sessions', component: DetailComponent }
         ]),
-        HttpClientModule,
+        HttpClientModule, // Utiliser HttpClientModule pour permettre les appels HTTP réels
         MatSnackBarModule,
         ReactiveFormsModule,
         MatIconModule,
@@ -77,19 +40,40 @@ describe('DetailComponent', () => {
       ],
       declarations: [DetailComponent],
       providers: [
-        { provide: SessionService, useValue: mockSessionService },
-        { provide: SessionApiService, useValue: mockSessionApiService },
-        { provide: TeacherService, useValue: mockTeacherService },
-        { provide: ActivatedRoute, useValue: mockActivatedRoute }
+        SessionService,       // Utiliser les vrais services ici
+        SessionApiService,    // Pas de mocks
+        TeacherService,       // Pas de mocks
+        {
+          provide: ActivatedRoute, // Fournir une route simulée
+          useValue: {
+            snapshot: {
+              paramMap: {
+                get: (key: string) => '1' // Simuler un paramètre de route "id"
+              }
+            }
+          }
+        }
       ],
-    })
-      .compileComponents();
+    }).compileComponents();
 
-    // Injection des services et création du composant
     sessionService = TestBed.inject(SessionService);
     sessionApiService = TestBed.inject(SessionApiService);
     teacherService = TestBed.inject(TeacherService);
     router = TestBed.inject(Router);
+
+    // Initialiser sessionInformation pour éviter les erreurs "undefined"
+    sessionService.sessionInformation = {
+      admin: true,         // Simuler un admin
+      id: 1,               // Simuler un utilisateur avec ID 1 (nombre)
+      token: 'fake-token', // Ajouter un faux jeton
+      type: 'Bearer',      // Type de jeton, par exemple 'Bearer'
+      username: 'testuser', // Nom d'utilisateur simulé
+      firstName: 'John',   // Prénom simulé
+      lastName: 'Doe'      // Nom de famille simulé
+    };
+
+
+
     fixture = TestBed.createComponent(DetailComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -101,43 +85,57 @@ describe('DetailComponent', () => {
   });
 
   // Test de l'affichage du bouton de suppression uniquement pour l'admin
-  it('should show delete button only for admin', () => {
-    // Cas où l'utilisateur est admin
+  it('should show delete button only for admin', fakeAsync(() => {
+    // Forcer l'utilisateur à être admin
     component.isAdmin = true;
-    fixture.detectChanges(); // Re-rendre le composant
+    fixture.detectChanges();   // Détecter les changements après la mise à jour de isAdmin
 
-    // Utiliser un sélecteur plus spécifique pour cibler le bouton de suppression
-    let buttons = fixture.debugElement.queryAll(By.css('button[color="warn"]'));
-    let deleteButton = buttons.find(button => button.nativeElement.textContent.includes('Delete'));
-    expect(deleteButton).toBeTruthy(); // Le bouton doit être présent
+    // Utiliser whenStable pour s'assurer que la détection des changements est complète
+    fixture.whenStable().then(() => {
+      // Cibler le bouton de suppression par son attribut color="warn"
+      const deleteButton = fixture.debugElement.query(By.css('button[color="warn"]'));
+      expect(deleteButton).toBeTruthy();  // Le bouton doit être présent si l'utilisateur est admin
+    });
 
-    // Cas où l'utilisateur n'est pas admin
+    flush();  // Nettoyer les tâches restantes
+  }));
+
+  it('should not show delete button if not admin', fakeAsync(() => {
+    // Forcer l'utilisateur à ne pas être admin
     component.isAdmin = false;
-    fixture.detectChanges(); // Re-rendre le composant
+    fixture.detectChanges();   // Détecter les changements après la mise à jour de isAdmin
 
-    // Utiliser un sélecteur plus spécifique pour cibler le bouton de suppression
-    buttons = fixture.debugElement.queryAll(By.css('button[color="warn"]'));
-    deleteButton = buttons.find(button => button.nativeElement.textContent.includes('Delete'));
-    expect(deleteButton).toBeUndefined(); // Le bouton ne doit pas être présent
-  });
+    // Utiliser whenStable pour s'assurer que la détection des changements est complète
+    fixture.whenStable().then(() => {
+      // Cibler le bouton de suppression par son attribut color="warn"
+      const deleteButton = fixture.debugElement.query(By.css('button[color="warn"]'));
+      expect(deleteButton).toBeNull();  // Le bouton ne doit pas être présent si l'utilisateur n'est pas admin
+    });
 
-  // Test de la navigation vers l'arrière
+    flush();  // Nettoyer les tâches restantes
+  }));
+
+
+  // Test de la navigation arrière
   it('should navigate back', () => {
     const spy = jest.spyOn(window.history, 'back');
     component.back();
     expect(spy).toHaveBeenCalled();
   });
 
-  // Test de la suppression de la session
+  // Test de la suppression de session
   it('should delete session and navigate to sessions list', fakeAsync(() => {
-    // Espionner la méthode navigate du router
     const navigateSpy = jest.spyOn(router, 'navigate');
-    component.delete();// Appeler la méthode delete du composant  
-    tick();// Avancer le temps pour compléter l'observable     
-    flush();// Vider toutes les minuteries en attente    
-    // Vérifier que la méthode delete de sessionApiService a été appelée avec le bon ID de session
+
+    // Simuler la suppression
+    jest.spyOn(sessionApiService, 'delete').mockReturnValue(of({}));
+
+    component.delete();
+    tick();
+    flush();
+
+    // Vérifier que la suppression et la redirection ont eu lieu
     expect(sessionApiService.delete).toHaveBeenCalledWith('1');
-    // Vérifier que la méthode navigate du router a été appelée avec le bon chemin
     expect(navigateSpy).toHaveBeenCalledWith(['sessions']);
   }));
 });
